@@ -16,9 +16,11 @@ import com.example.movieappcompose.presentation.components.listOfMenus
 import com.example.movieappcompose.ui.theme.MovieAppComposeTheme
 import com.example.movieappcompose.util.Navigation
 import com.example.movieappcompose.util.Screen
+import com.google.accompanist.pager.ExperimentalPagerApi
 import dagger.hilt.android.AndroidEntryPoint
 
 
+@ExperimentalPagerApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalMaterialApi
 @AndroidEntryPoint

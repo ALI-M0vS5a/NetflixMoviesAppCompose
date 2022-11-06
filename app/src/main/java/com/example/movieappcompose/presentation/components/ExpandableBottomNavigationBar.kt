@@ -4,8 +4,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,7 +13,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.movieappcompose.domain.model.bottom_bar_menu.BottomMenuItem
+import com.example.movieappcompose.domain.model.menu_home_screen.BottomMenuItem
 
 @Composable
 fun ExpandableBottomNavigationBar(

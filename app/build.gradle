@@ -97,4 +97,10 @@ dependencies {
     // Coil
     implementation 'io.coil-kt:coil-compose:2.2.0'
     implementation 'io.coil-kt:coil-svg:2.2.0'
+
+    // Pager
+    implementation "com.google.accompanist:accompanist-pager:0.27.0"
+    // If using indicators, also depend on
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.27.0"
+
 }

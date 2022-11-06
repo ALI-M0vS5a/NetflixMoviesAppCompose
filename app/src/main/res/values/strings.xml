@@ -17,4 +17,12 @@
     <string name="video">Video</string>
     <string name="favourites">Favourites</string>
     <string name="person">Person</string>
+    <string name="search">Search Movies</string>
+    <string name="movies">Movies</string>
+    <string name="tv_shows">TV Shows</string>
+    <string name="trailers">Trailers</string>
+    <string name="up_coming_movies_poster">UpcomingMoviesPoster</string>
+    <string name="letter_n_logo">Letter N</string>
+    <string name="watch_now">Available Now</string>
+    <string name="throwable"> %d </string>
 </resources>

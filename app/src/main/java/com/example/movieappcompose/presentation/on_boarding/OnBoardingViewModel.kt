@@ -5,11 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieappcompose.domain.model.top_rated.TopRatedMovies
 import com.example.movieappcompose.domain.repository.MoviesRepository
-import com.example.movieappcompose.util.Resource
+import com.example.movieappcompose.util.DefaultPaginator
 import com.example.movieappcompose.util.UiEvent
-import com.example.movieappcompose.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,8 +24,33 @@ class OnBoardingViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val paginator = DefaultPaginator(
+        initialKey = state.page,
+        onLoadUpdated = { isLoading ->
+            state = state.copy(isLoadingFromPaging = isLoading)
+        },
+        onRequest = { nextPage ->
+            repository.getTopRatedMovies(nextPage)
+        },
+        getNextKey = {
+            state.page + 1
+        },
+        onError = {
+            state = state.copy(error = it)
+        },
+        onSuccess = { items, newKey ->
+            state = state.copy(
+                listOfTopRatedMoviesItem = state.listOfTopRatedMoviesItem + items,
+                page = newKey,
+                endReached = items.isEmpty()
+            )
+
+        }
+
+    )
+
     init {
-        getTopRatedMovies()
+        loadNextItems()
     }
 
     fun onEvent(event: OnBoardingEvent) {
@@ -46,30 +69,10 @@ class OnBoardingViewModel @Inject constructor(
             }
         }
     }
-    private fun getTopRatedMovies() {
+    fun loadNextItems() {
         viewModelScope.launch {
-            repository
-                .getTopRatedMovies().collect { result ->
-                    when(result) {
-                        is Resource.Success -> {
-                            state = state.copy(
-                                isLoading = false,
-                                listOfTopRatedMovies = result.data ?: TopRatedMovies(emptyList())
-                            )
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(isLoading = false)
-                            _eventFlow.emit(UiEvent.Message(
-                                result.message ?: UiText.unknownError()
-                            ))
-                        }
-                        is Resource.Loading -> {
-                            state = state.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-                }
+            paginator.loadNextItems()
         }
     }
 }
+

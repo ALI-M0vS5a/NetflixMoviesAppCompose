@@ -17,3 +17,13 @@ fun TopRatedMoviesDto.toTopRatedMovies(): TopRatedMovies {
         results = results.map { it.toTopRatedMoviesResult() }
     )
 }
+
+fun TopRatedMovies.toListOfTopRatedMovies(): List<TopRatedMovies> {
+    return listOf(
+        TopRatedMovies(
+            results = results
+        )
+    )
+}
+
+

@@ -19,7 +19,7 @@ import com.example.movieappcompose.domain.model.top_rated.TopRatedMoviesResult
 @Composable
 fun TopRatedMoviesItem(
     modifier: Modifier = Modifier,
-    topRatedMovies: TopRatedMoviesResult,
+    topRatedMoviesResult: TopRatedMoviesResult,
     onItemClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -31,8 +31,7 @@ fun TopRatedMoviesItem(
         },
 
         ) {
-        val image = "https://image.tmdb.org/t/p/original" + topRatedMovies.poster_path
-
+        val image = "https://image.tmdb.org/t/p/original${topRatedMoviesResult.poster_path}"
         Image(
             painter = rememberAsyncImagePainter(
                 model = ImageRequest.Builder(context)

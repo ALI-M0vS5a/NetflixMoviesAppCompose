@@ -1,4 +1,4 @@
-package com.example.movieappcompose.domain.model.bottom_bar_menu
+package com.example.movieappcompose.domain.model.menu_home_screen
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.movieappcompose.util.UiText

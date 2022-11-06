@@ -10,8 +10,10 @@ import com.example.movieappcompose.presentation.home.HomeScreen
 import com.example.movieappcompose.presentation.on_boarding.OnBoardingScreen
 import com.example.movieappcompose.presentation.person.PersonScreen
 import com.example.movieappcompose.presentation.video.VideoScreen
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 
+@ExperimentalPagerApi
 @ExperimentalMaterialApi
 @Composable
 fun Navigation(

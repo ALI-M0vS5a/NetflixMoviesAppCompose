@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -84,7 +83,14 @@ fun OnBoardingScreen(
             if (viewModel.state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
+                        .align(Alignment.Center)
+                        .padding(top = 250.dp)
+                )
+            }
+            if (viewModel.state.isLoadingFromPaging) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
                         .padding(top = 250.dp)
                 )
             }
@@ -188,19 +194,24 @@ fun TopSection(
 fun TopRatedMoviesSection(
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     LazyRow {
-        items(viewModel.state.listOfTopRatedMovies.results) { topRatedMovies ->
-            Spacer(modifier = Modifier.width(35.dp))
-            TopRatedMoviesItem(
-                topRatedMovies = topRatedMovies,
-                modifier = Modifier
-                    .height(280.dp)
-                    .width(200.dp),
-                onItemClick = {
-                    viewModel.onEvent(OnBoardingEvent.OnMovieClick(topRatedMovies.original_title))
+        viewModel.state.listOfTopRatedMoviesItem.let { results ->
+            items(results.size) { i ->
+                Spacer(modifier = Modifier.width(35.dp))
+                val topRatedMoviesResult = results[i]
+                if(i >= results.size - 1 && !viewModel.state.endReached && !viewModel.state.isLoading) {
+                    viewModel.loadNextItems()
                 }
-            )
+                TopRatedMoviesItem(
+                    topRatedMoviesResult = topRatedMoviesResult,
+                    modifier = Modifier
+                        .height(280.dp)
+                        .width(200.dp),
+                    onItemClick = {
+                        viewModel.onEvent(OnBoardingEvent.OnMovieClick(topRatedMoviesResult.original_title))
+                    }
+                )
+            }
         }
     }
 }
