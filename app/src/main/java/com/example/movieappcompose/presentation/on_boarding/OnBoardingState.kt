@@ -7,7 +7,6 @@ import com.example.movieappcompose.util.UiText
 
 data class OnBoardingState(
     val listOfTopRatedMoviesItem: List<TopRatedMoviesResult> = emptyList(),
-    val isLoading: Boolean = false,
     val isLoadingFromPaging: Boolean = false,
     val error: UiText? = null,
     val endReached: Boolean = false,

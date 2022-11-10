@@ -25,4 +25,10 @@
     <string name="letter_n_logo">Letter N</string>
     <string name="watch_now">Available Now</string>
     <string name="throwable"> %d </string>
+    <string name="popular_movies">Popular Movie</string>
+    <string name="view_all">View All</string>
+    <string name="star_rate">StarRate</string>
+    <string name="play">Play</string>
+    <string name="hint">Search...</string>
+    <string name="empty_search">Empty Search</string>
 </resources>

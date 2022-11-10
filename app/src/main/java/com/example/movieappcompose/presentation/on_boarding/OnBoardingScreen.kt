@@ -9,8 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +57,9 @@ fun OnBoardingScreen(
             }
         }
     }
+    var spacingForLoading by remember {
+        mutableStateOf(0.dp)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,21 +80,48 @@ fun OnBoardingScreen(
                         .padding(start = 40.dp, end = 15.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                TopRatedMoviesSection()
-            }
-            if (viewModel.state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(top = 250.dp)
-                )
-            }
-            if (viewModel.state.isLoadingFromPaging) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(top = 250.dp)
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    LazyRow(modifier = Modifier.padding(end = spacingForLoading)) {
+                        viewModel.state.listOfTopRatedMoviesItem.let { results ->
+                            items(results.size) { i ->
+                                Spacer(modifier = Modifier.width(35.dp))
+                                val topRatedMoviesResult = results[i]
+                                if (i >= results.size - 1 && !viewModel.state.endReached && !viewModel.state.isLoadingFromPaging) {
+                                    viewModel.loadNextItems()
+                                }
+                                TopRatedMoviesItem(
+                                    topRatedMoviesResult = topRatedMoviesResult,
+                                    modifier = Modifier
+                                        .height(280.dp)
+                                        .width(200.dp),
+                                    onItemClick = {
+                                        viewModel.onEvent(
+                                            OnBoardingEvent.OnMovieClick(
+                                                topRatedMoviesResult.original_title
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    if (viewModel.state.isLoadingFromPaging) {
+                        if (viewModel.state.page == 1) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                            )
+                        } else {
+                            spacingForLoading = 150.dp
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                            )
+                        }
+                    } else {
+                        spacingForLoading = 0.dp
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(55.dp))
@@ -194,26 +223,8 @@ fun TopSection(
 fun TopRatedMoviesSection(
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
-    LazyRow {
-        viewModel.state.listOfTopRatedMoviesItem.let { results ->
-            items(results.size) { i ->
-                Spacer(modifier = Modifier.width(35.dp))
-                val topRatedMoviesResult = results[i]
-                if(i >= results.size - 1 && !viewModel.state.endReached && !viewModel.state.isLoading) {
-                    viewModel.loadNextItems()
-                }
-                TopRatedMoviesItem(
-                    topRatedMoviesResult = topRatedMoviesResult,
-                    modifier = Modifier
-                        .height(280.dp)
-                        .width(200.dp),
-                    onItemClick = {
-                        viewModel.onEvent(OnBoardingEvent.OnMovieClick(topRatedMoviesResult.original_title))
-                    }
-                )
-            }
-        }
-    }
+
+
 }
 
 @Composable

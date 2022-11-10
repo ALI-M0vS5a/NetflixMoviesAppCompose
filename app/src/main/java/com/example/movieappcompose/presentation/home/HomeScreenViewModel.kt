@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieappcompose.domain.model.up_coming.Dates
-import com.example.movieappcompose.domain.model.up_coming.UpcomingMovies
 import com.example.movieappcompose.domain.repository.MoviesRepository
 import com.example.movieappcompose.util.DefaultPaginator
 import com.example.movieappcompose.util.Resource
@@ -24,6 +22,7 @@ class HomeScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeScreenState())
+    var TVShowsState by mutableStateOf(TVShowsState())
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -31,7 +30,7 @@ class HomeScreenViewModel @Inject constructor(
     private val paginator = DefaultPaginator(
         initialKey = state.page,
         onLoadUpdated = {
-            state = state.copy(isLoadingFromPaging = it)
+            state = state.copy(isLoadingMostPopularMoviesFromPaging = it)
         },
         onRequest = { nextPage ->
             repository.getUpcomingMovies(nextPage)
@@ -47,35 +46,61 @@ class HomeScreenViewModel @Inject constructor(
                 listOfUpcomingMovies = state.listOfUpcomingMovies + items,
                 page = newKey,
                 endReached = items.isEmpty(),
-                isMoviesTab = true
+                isMoviesTab = true,
+                isTVShowsTab = false
+            )
+        }
+    )
+    private val TVShowsPaginator = DefaultPaginator(
+        initialKey = state.page,
+        onLoadUpdated = {
+            TVShowsState = TVShowsState.copy(isLoading = it)
+        },
+        onRequest = { nextPage ->
+            repository.getTVShows(nextPage)
+        },
+        getNextKey = {
+            TVShowsState.page + 1
+        },
+        onError = {
+            _eventFlow.emit(UiEvent.Message(it ?: UiText.unknownError()))
+        },
+        onSuccess = { items, newKey ->
+            TVShowsState = TVShowsState.copy(
+                listOfTVShows = TVShowsState.listOfTVShows + items,
+                page = newKey,
+                endReached = items.isEmpty()
+            )
+            state = state.copy(
+                isTVShowsTab = true,
+                isMoviesTab = false
             )
         }
     )
 
     init {
-        getUpcomingMovies()
+        loadNextItems()
+        getMostPopularMovies()
+        loadNextItemsTVShows()
     }
 
     fun onEvent(event: HomeScreenEvent) {
-        when(event) {
+        when (event) {
             is HomeScreenEvent.OnSearchClick -> {
-
+                viewModelScope.launch {
+                    _eventFlow.emit(UiEvent.OnNavigate)
+                }
             }
             is HomeScreenEvent.OnMoviesTabClick -> {
-               getUpcomingMovies()
+                state = state.copy(isMoviesTab = true, isTVShowsTab = false)
             }
             is HomeScreenEvent.OnTVShowsClick -> {
-                state = state.copy(
-                    listOfUpcomingMovies = emptyList(),
-                    isMoviesTab = false,
-                    isLoading = false
-                )
+                state = state.copy(isMoviesTab = false, isTVShowsTab = true)
             }
             is HomeScreenEvent.OnTrailersClick -> {
                 state = state.copy(
-                    listOfUpcomingMovies = emptyList(),
-                    isMoviesTab = false,
-                    isLoading = false
+                    isTVShowsTab = false,
+                    isMoviesTab = false
                 )
             }
         }
@@ -86,29 +111,29 @@ class HomeScreenViewModel @Inject constructor(
             paginator.loadNextItems()
         }
     }
-
-    private fun getUpcomingMovies() {
+    fun loadNextItemsTVShows() {
         viewModelScope.launch {
-            repository
-                .getUpcomingMovies(1).collect { result ->
+            TVShowsPaginator.loadNextItems()
+        }
+    }
+
+    private fun getMostPopularMovies() {
+        viewModelScope.launch {
+            repository.getMostPopularMovies(1)
+                .collect { result ->
                     when (result) {
                         is Resource.Success -> {
                             state = state.copy(
-                                isLoading = false,
-                                listOfUpcomingMovies = result.data ?: emptyList(),
-                                isMoviesTab = true
+                                listOfMostPopularMovies = result.data ?: emptyList(),
+                                isLoadingMostPopularMovies = false
                             )
                         }
                         is Resource.Loading -> {
-                            state = state.copy(isLoading = true)
+                            state = state.copy(isLoadingMostPopularMovies = false)
                         }
                         is Resource.Error -> {
-                            state = state.copy(isLoading = false)
-                            _eventFlow.emit(
-                                UiEvent.Message(
-                                    uiText = result.message ?: UiText.unknownError()
-                                )
-                            )
+                            state = state.copy(isLoadingMostPopularMovies = false)
+                            _eventFlow.emit(UiEvent.Message(result.message ?: UiText.unknownError()))
                         }
                     }
                 }

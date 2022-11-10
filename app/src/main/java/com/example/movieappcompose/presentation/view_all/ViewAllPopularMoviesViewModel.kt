@@ -1,4 +1,4 @@
-package com.example.movieappcompose.presentation.on_boarding
+package com.example.movieappcompose.presentation.view_all
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,22 +16,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OnBoardingViewModel @Inject constructor(
+class ViewAllPopularMoviesViewModel @Inject constructor(
     private val repository: MoviesRepository
 ) : ViewModel() {
 
-    var state by mutableStateOf(OnBoardingState())
+    var state by mutableStateOf(ViewAllMoviesState())
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val paginator = DefaultPaginator(
+    var paginator = DefaultPaginator(
         initialKey = state.page,
-        onLoadUpdated = { isLoading ->
-            state = state.copy(isLoadingFromPaging = isLoading)
+        onLoadUpdated = {
+            state = state.copy(isLoading = it)
         },
         onRequest = { nextPage ->
-            repository.getTopRatedMovies(nextPage)
+            repository.getMostPopularMovies(nextPage)
         },
         getNextKey = {
             state.page + 1
@@ -41,39 +41,20 @@ class OnBoardingViewModel @Inject constructor(
         },
         onSuccess = { items, newKey ->
             state = state.copy(
-                listOfTopRatedMoviesItem = state.listOfTopRatedMoviesItem + items,
+                listOfAllPopularMovies = state.listOfAllPopularMovies + items,
                 page = newKey,
                 endReached = items.isEmpty()
             )
-
         }
-
     )
-
     init {
         loadNextItems()
     }
 
-    fun onEvent(event: OnBoardingEvent) {
-        when(event) {
-            is OnBoardingEvent.OnMovieClick -> {
-                viewModelScope.launch {
-                    state = state.copy(
-                        onMovieClick = event.title
-                    )
-                    _eventFlow.emit(
-                        UiEvent.ShowMovieTitle(
-                            state.onMovieClick
-                        )
-                    )
-                }
-            }
-        }
-    }
     fun loadNextItems() {
         viewModelScope.launch {
             paginator.loadNextItems()
         }
     }
-}
 
+}

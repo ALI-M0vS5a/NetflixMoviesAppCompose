@@ -6,5 +6,6 @@ data class MostPopularMoviesResult(
     val popularity: Double,
     val poster_path: String,
     val vote_average: Double,
-    val vote_count: Int
+    val vote_count: Int,
+    val id: Int
 )
