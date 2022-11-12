@@ -10,5 +10,6 @@ data class SearchMoviesResult(
     val release_date: String,
     val title: String,
     val vote_average: Double,
-    val vote_count: Int
+    val vote_count: Int,
+    val id: Int
 )

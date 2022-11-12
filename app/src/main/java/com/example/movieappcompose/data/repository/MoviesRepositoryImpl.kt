@@ -2,6 +2,7 @@ package com.example.movieappcompose.data.repository
 
 import com.example.movieappcompose.R
 import com.example.movieappcompose.data.mapper.most_popular_mapper.toMostPopularMoviesResult
+import com.example.movieappcompose.data.mapper.movie_detail_mapper.toMovieDetails
 import com.example.movieappcompose.data.mapper.movie_video_mapper.toMovieVideoResult
 import com.example.movieappcompose.data.mapper.popular_tv_shows.toPopularTVShowsResult
 import com.example.movieappcompose.data.mapper.search_movies.toSearchMoviesResult
@@ -9,6 +10,7 @@ import com.example.movieappcompose.data.mapper.top_rated_mapper.toTopRatedMovies
 import com.example.movieappcompose.data.mapper.up_coming_mapper.toUpcomingMoviesResult
 import com.example.movieappcompose.data.remote.MovieApi
 import com.example.movieappcompose.domain.model.most_popular.MostPopularMoviesResult
+import com.example.movieappcompose.domain.model.movie_details.MovieDetails
 import com.example.movieappcompose.domain.model.movie_video.MovieVideoResult
 import com.example.movieappcompose.domain.model.popular_tv_shows.PopularTVShowsResult
 import com.example.movieappcompose.domain.model.search_movies.SearchMoviesResult
@@ -212,6 +214,36 @@ class MoviesRepositoryImpl @Inject constructor(
             emit(Resource.Loading())
             emit(Resource.Success(
                 data = video.results.map { it.toMovieVideoResult() }
+            ))
+        }
+    }
+
+    override suspend fun getMovieDetailById(movieId: Int): Flow<Resource<MovieDetails>> = flow {
+        val remote = try {
+            api.getMovieDetailById(movie_id = movieId)
+        } catch (e: IOException) {
+            emit(
+                Resource.Error(
+                    message = UiText.StringResource(
+                        resId = R.string.please_check_your_connection
+                    )
+                )
+            )
+            null
+        } catch (e: HttpException) {
+            emit(
+                Resource.Error(
+                    message = (UiText.StringResource(
+                        resId = R.string.Oops_something_went_wrong
+                    ))
+                )
+            )
+            null
+        }
+        remote?.let { detail ->
+            emit(Resource.Loading())
+            emit(Resource.Success(
+                data = detail.toMovieDetails()
             ))
         }
     }

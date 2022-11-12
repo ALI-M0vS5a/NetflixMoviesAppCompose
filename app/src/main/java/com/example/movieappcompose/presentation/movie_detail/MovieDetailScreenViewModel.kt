@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.ln
+import kotlin.math.pow
 
 
 @HiltViewModel
@@ -32,18 +34,29 @@ class MovieDetailScreenViewModel @Inject constructor(
 
     init {
         movieId?.let { movieId ->
-            println("movie_id is = $movieId")
             getVideoById(movieId)
+            getMovieDetail(movieId)
         }
     }
+
+    fun onEvent(event: MovieDetailEvent) {
+        when(event) {
+            is MovieDetailEvent.Refresh -> {
+                movieId?.let { movieId ->
+                    getVideoById(movieId)
+                    getMovieDetail(movieId)
+                }
+            }
+        }
+    }
+
 
 
     private fun getVideoById(movieId: Int) {
         viewModelScope.launch {
             repository.getVideoById(movieId).collect { result ->
-                when(result) {
+                when (result) {
                     is Resource.Success -> {
-                        println("result data = ${result.data}")
                         state = state.copy(
                             listOfMovie = result.data ?: emptyList(),
                             isLoading = false
@@ -55,10 +68,37 @@ class MovieDetailScreenViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
+                        state = state.copy(
+                            isLoading = false
+                        )
                         _eventFlow.emit(UiEvent.Message(result.message ?: UiText.unknownError()))
                     }
                 }
             }
+        }
+    }
+    private fun getMovieDetail(movieId: Int) {
+        viewModelScope.launch {
+            repository.getMovieDetailById(movieId)
+                .collect { result ->
+                    when(result) {
+                        is Resource.Success -> {
+                            state = state.copy(
+                                isLoadingDetail = false,
+                                MovieDetail = result.data
+                            )
+                        }
+                        is Resource.Loading -> {
+                            state = state.copy(isLoadingDetail = true)
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(isLoadingDetail = false)
+                            _eventFlow.emit(UiEvent.Message(
+                                result.message ?: UiText.unknownError()
+                            ))
+                        }
+                    }
+                }
         }
     }
 }

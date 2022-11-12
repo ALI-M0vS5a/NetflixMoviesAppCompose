@@ -1,6 +1,7 @@
 package com.example.movieappcompose.data.remote
 
 import com.example.movieappcompose.data.remote.dto.most_popular_dto.MostPopularMoviesDto
+import com.example.movieappcompose.data.remote.dto.movie_details_dto.MovieDetailDto
 import com.example.movieappcompose.data.remote.dto.movie_video_dto.MovieVideoDto
 import com.example.movieappcompose.data.remote.dto.search_movies_dto.SearchMoviesDto
 import com.example.movieappcompose.data.remote.dto.top_rated_movies_dto.TopRatedMoviesDto
@@ -50,4 +51,10 @@ interface MovieApi {
         @Path("movie_id") movie_id: Int,
         @Query("api_key") apikey: String = API_KEY
     ): MovieVideoDto
+
+    @GET("/3/movie/{movie_id}")
+    suspend fun getMovieDetailById(
+        @Path("movie_id") movie_id: Int,
+        @Query("api_key") apikey: String = API_KEY
+    ): MovieDetailDto
 }

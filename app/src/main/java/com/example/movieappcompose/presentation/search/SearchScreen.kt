@@ -24,15 +24,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.movieappcompose.R
 import com.example.movieappcompose.presentation.search.components.SearchResultItem
+import com.example.movieappcompose.util.Screen
 import com.example.movieappcompose.util.UiEvent
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterialApi
 @Composable
 fun SearchScreen(
-    viewModel: SearchScreenViewModel = hiltViewModel()
+    viewModel: SearchScreenViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
@@ -71,7 +74,7 @@ fun SearchScreen(
                     SearchResultItem(
                         searchResult = movies,
                         onItemClick = {
-
+                            navController.navigate(Screen.MovieDetailScreen.route + "?movie_id=${movies.id}")
                         },
                         modifier = Modifier
                             .height(215.dp)

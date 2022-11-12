@@ -31,4 +31,10 @@
     <string name="play">Play</string>
     <string name="hint">Search...</string>
     <string name="empty_search">Empty Search</string>
+    <string name="reviews">Reviews</string>
+    <string name="add_to_list">Add to list</string>
+    <string name="download">Download</string>
+    <string name="share">Share</string>
+    <string name="description">Description</string>
+    <string name="overview">Overview</string>
 </resources>

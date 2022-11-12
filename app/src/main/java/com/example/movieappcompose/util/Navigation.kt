@@ -55,7 +55,9 @@ fun Navigation(
             )
         }
         composable(route = Screen.SearchScreen.route) {
-            SearchScreen()
+            SearchScreen(
+                navController = navController
+            )
         }
         composable(
             route = Screen.MovieDetailScreen.route + "?movie_id={movie_id}",

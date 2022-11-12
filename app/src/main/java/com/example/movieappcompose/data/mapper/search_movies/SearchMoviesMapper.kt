@@ -20,6 +20,7 @@ fun SearchMoviesResultDto.toSearchMoviesResult(): SearchMoviesResult {
         release_date = release_date,
         title = title,
         vote_average = vote_average,
-        vote_count = vote_count
+        vote_count = vote_count,
+        id = id
     )
 }

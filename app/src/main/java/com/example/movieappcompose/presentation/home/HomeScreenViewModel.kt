@@ -11,8 +11,10 @@ import com.example.movieappcompose.util.Resource
 import com.example.movieappcompose.util.UiEvent
 import com.example.movieappcompose.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -81,7 +83,6 @@ class HomeScreenViewModel @Inject constructor(
     init {
         loadNextItems()
         getMostPopularMovies()
-        loadNextItemsTVShows()
     }
 
     fun onEvent(event: HomeScreenEvent) {
@@ -95,7 +96,11 @@ class HomeScreenViewModel @Inject constructor(
                 state = state.copy(isMoviesTab = true, isTVShowsTab = false)
             }
             is HomeScreenEvent.OnTVShowsClick -> {
-                state = state.copy(isMoviesTab = false, isTVShowsTab = true)
+                state = state.copy(
+                    isMoviesTab = false,
+                    isTVShowsTab = true
+                )
+                getTVShows()
             }
             is HomeScreenEvent.OnTrailersClick -> {
                 state = state.copy(
@@ -130,6 +135,30 @@ class HomeScreenViewModel @Inject constructor(
                         }
                         is Resource.Loading -> {
                             state = state.copy(isLoadingMostPopularMovies = false)
+                        }
+                        is Resource.Error -> {
+                            state = state.copy(isLoadingMostPopularMovies = false)
+                            _eventFlow.emit(UiEvent.Message(result.message ?: UiText.unknownError()))
+                        }
+                    }
+                }
+        }
+    }
+    private fun getTVShows() {
+        viewModelScope.launch {
+            repository.getTVShows(1)
+                .collect { result ->
+                    when(result) {
+                        is Resource.Success -> {
+                            TVShowsState = TVShowsState.copy(
+                                listOfTVShows = result.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
+                        is Resource.Loading -> {
+                            TVShowsState = TVShowsState.copy(
+                                isLoading = true
+                            )
                         }
                         is Resource.Error -> {
                             state = state.copy(isLoadingMostPopularMovies = false)

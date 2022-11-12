@@ -1,6 +1,7 @@
 package com.example.movieappcompose.domain.repository
 
 import com.example.movieappcompose.domain.model.most_popular.MostPopularMoviesResult
+import com.example.movieappcompose.domain.model.movie_details.MovieDetails
 import com.example.movieappcompose.domain.model.movie_video.MovieVideoResult
 import com.example.movieappcompose.domain.model.popular_tv_shows.PopularTVShowsResult
 import com.example.movieappcompose.domain.model.search_movies.SearchMoviesResult
@@ -17,4 +18,5 @@ interface MoviesRepository {
     suspend fun searchMovies(query: String,page: Int): Flow<Resource<List<SearchMoviesResult>>>
     suspend fun getTVShows(page: Int): Flow<Resource<List<PopularTVShowsResult>>>
     suspend fun getVideoById(videoId: Int): Flow<Resource<List<MovieVideoResult>>>
+    suspend fun getMovieDetailById(movieId: Int): Flow<Resource<MovieDetails>>
 }

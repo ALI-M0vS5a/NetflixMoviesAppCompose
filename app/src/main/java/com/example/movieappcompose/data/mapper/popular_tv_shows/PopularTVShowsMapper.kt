@@ -13,7 +13,7 @@ fun PopularTVShowsDto.toPopularTVShows(): PopularTVShows {
 }
 fun PopularTVShowsResultDto.toPopularTVShowsResult(): PopularTVShowsResult {
     return PopularTVShowsResult(
-        poster_path = poster_path,
+        poster_path = poster_path ?: "",
         vote_average = vote_average
     )
 }
